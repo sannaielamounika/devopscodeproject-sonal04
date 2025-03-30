@@ -1,7 +1,14 @@
+
+
+# Use the official Tomcat 9 image as the base image
 FROM tomcat:9
-ADD addressbook.war /usr/local/tomcat/webapps
-CMD ["catalina.sh", "run"]
+
+# Copy the WAR file to Tomcat's webapps directory
+ADD addressbook.war /usr/local/tomcat/webapps/
+
+# Expose port 8082 so the application can be accessed externally
 EXPOSE 8082
-# Run the application
-CMD ["java", "-war", "addressbook.war"]
+
+# Start Tomcat server
+CMD ["catalina.sh", "run"]
 
