@@ -1,50 +1,39 @@
+pipeline {
+    agent any
 
-pipeline{
-    tools{
-       
-        maven 'mymaven'
+    environment {
+        DOCKER_IMAGE = "sannaielamounika/devopscodeproject-latest"
+        DOCKER_TAG = "latest"
     }
-	agent any
-      stages{
-           stage('Checkout the code'){
-	    
-               steps{
-		 echo 'cloning the repo'
-                 git 'https://github.com/Sonal0409/DevOpsClassCodes.git'
-              }
-          }
-          stage('Compile'){
-             
-              steps{
-                  echo 'complie the code again..'
-                  sh 'mvn compile'
-	      }
-          }
-          stage('CodeReview'){
-		  
-              steps{
-		    
-		  echo 'codeReview'
-                  sh 'mvn pmd:pmd'
-              }
-          }
-           stage('UnitTest'){
-		  
-              steps{
-	         
-                  sh 'mvn test'
-              }
-          
-          }
-        
-          stage('Package'){
-		  
-              steps{
-		  
-                  sh 'mvn package'
-              }
-          }
-	     
-          
-      }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/sannaielamounika/devopscodeproject-sonal04.git'
+            }
+        }
+
+        stage('Build Application') {
+            steps {
+                sh 'mvn clean package -DskipTests'  // For Java (Spring Boot)
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t $DOCKER_IMAGE:$DOCKER_TAG ."
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                withDockerRegistry([credentialsId: 'docker-hub-credentials', url: '']) {
+                    sh "docker push $DOCKER_IMAGE:$DOCKER_TAG"
+                }
+            }
+        }
+    }
 }
+
+
+
